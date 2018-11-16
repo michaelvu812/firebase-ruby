@@ -7,13 +7,14 @@ require 'uri'
 
 module Firebase
   class Client
-    attr_reader :auth, :request
+    attr_reader :auth, :request, :format
 
-    def initialize(base_uri, auth=nil)
+    def initialize(base_uri, auth=nil, format=:json)
       if base_uri !~ URI::regexp(%w(https))
         raise ArgumentError.new('base_uri must be a valid https uri')
       end
       base_uri += '/' unless base_uri.end_with?('/')
+      @format = format
       @request = HTTPClient.new({
         :base_url => base_uri,
         :default_header => {
@@ -24,7 +25,7 @@ module Firebase
         # Using Admin SDK service account
         @credentials = Google::Auth::DefaultCredentials.make_creds(
           json_key_io: StringIO.new(auth),
-          scope: %w(https://www.googleapis.com/auth/firebase.database https://www.googleapis.com/auth/userinfo.email)
+          scope: %w(https://www.googleapis.com/auth/firebase.database https://www.googleapis.com/auth/firebase.remoteconfig https://www.googleapis.com/auth/userinfo.email)
         )
         @credentials.apply!(@request.default_header)
         @expires_at = @credentials.issued_at + 0.95 * @credentials.expires_in
@@ -74,8 +75,8 @@ module Firebase
         @credentials.apply! @request.default_header
         @expires_at = @credentials.issued_at + 0.95 * @credentials.expires_in
       end
-
-      Firebase::Response.new @request.request(verb, "#{path}.json", {
+      
+      Firebase::Response.new @request.request(verb, [path, format].reject(&:blank?).join('.'), {
         :body             => (data && data.to_json),
         :query            => (@secret ? { :auth => @secret }.merge(query) : query),
         :follow_redirect  => true
