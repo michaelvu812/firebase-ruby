@@ -83,10 +83,7 @@ update(path, data, query_options)
 
 ### Configuring HTTP options
 
-[httpclient](https://github.com/nahi/httpclient) is used under the covers to make HTTP requests.
-You may find yourself wanting to tweak the timeout settings. By default, `httpclient` uses
-some [sane defaults](https://github.com/nahi/httpclient/blob/dd322d39d4d11c48f7bbbc05ed6273ac912d3e3b/lib/httpclient/session.rb#L138),
-but it is quite easy to change them by modifying the `request` object directly:
+[Faraday](https://github.com/lostisland/faraday) is used under the covers to make HTTP requests.
 
 ```ruby
 firebase = Firebase::Client.new(base_uri)

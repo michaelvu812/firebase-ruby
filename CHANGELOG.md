@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.9
+
+* Switch to `faraday` client from `HTTPClient`
+
 ## 0.2.8
 
 * Fix [auth token expiration](https://github.com/oscardelben/firebase-ruby/pull/84) on longer lived Firebase objects.
