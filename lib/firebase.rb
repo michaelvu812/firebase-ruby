@@ -82,12 +82,16 @@ module Firebase
         @expires_at = @credentials.issued_at + 0.95 * @credentials.expires_in
       end
       body = data && data.to_json
-      
-      response = @request.run_request(verb, [path, format].reject(&:blank?).join('.'), body, nil) { |request|
+      response = @request.run_request(verb, firebase_path(path), body, nil) { |request|
         request.params.update(@secret ? { :auth => @secret }.merge(query) : query)
       }
 
       Firebase::Response.new response
+    end
+
+    def firebase_path(path)
+      # '.' present for root path
+      path == '.' ? '.json' : [path, format].reject(&:blank?).join('.')
     end
 
     def valid_json?(json)
